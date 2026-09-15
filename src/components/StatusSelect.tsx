@@ -19,7 +19,7 @@ export function StatusSelect({
   async function handleChange(next: UserShowStatus) {
     setStatus(next);
     setSaving(true);
-    await fetch(`/api/shows/${userShowId}`, {
+    await fetch(`/api/user-shows/${userShowId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: next }),
