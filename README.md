@@ -1,0 +1,93 @@
+# Cliffhanger
+
+A personal TV show tracker — a replacement for TV Time. Search shows, track
+what you're watching, check off episodes, and see what's coming up next.
+
+Solo-tracking MVP: no friends, feeds, or reviews (yet). Mobile-first PWA.
+
+## Stack
+
+- Next.js (App Router) + TypeScript + Tailwind CSS
+- PostgreSQL + Prisma
+- NextAuth.js (email/password)
+- [TMDb](https://www.themoviedb.org/) as the source of show/season/episode data
+- TanStack Query for client-side data fetching
+
+## Getting started
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Copy the env template and fill in the values:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   - `DATABASE_URL` — a Postgres connection string (Supabase, Neon, Railway,
+     or a local Postgres instance all work).
+   - `NEXTAUTH_SECRET` — generate with `openssl rand -base64 32`.
+   - `TMDB_API_KEY` — get one free at
+     https://www.themoviedb.org/settings/api (the v3 API key, not the read
+     access token).
+   - `CRON_SECRET` — any random string; used to authenticate the daily
+     refresh job (see below).
+
+3. Push the Prisma schema to your database:
+
+   ```bash
+   npx prisma db push
+   ```
+
+4. Run the dev server:
+
+   ```bash
+   npm run dev
+   ```
+
+   Visit http://localhost:3000 — you'll be redirected to `/signup` to create
+   your account.
+
+## Project structure
+
+```
+prisma/schema.prisma       Data model (User, Show, Season, Episode, UserShow, UserEpisode)
+src/app/                   Routes (App Router)
+  login/, signup/          Auth pages
+  dashboard/                My Shows — tracked shows grouped by status
+  shows/[id]/                Show detail — seasons/episodes, mark watched
+  up-next/                  Upcoming episode air dates, sorted by date
+  stats/                    Aggregate watch stats
+  api/                      Route handlers (auth, TMDb search, tracking, cron)
+src/lib/                   Server-side helpers (prisma client, auth config, TMDb client)
+src/components/            Shared UI components
+```
+
+## Testing locally
+
+Each feature area below documents how to verify it manually; there's no
+automated test suite yet (this is intentionally kept small for a personal
+project — add one if the app grows).
+
+## Cron job (daily refresh)
+
+`GET /api/cron/refresh` re-syncs metadata (season/episode lists, air dates,
+show status) for every show currently on someone's list. It requires a
+bearer token matching `CRON_SECRET`:
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" https://your-app.example.com/api/cron/refresh
+```
+
+On Vercel, configure this in `vercel.json` (already included) as a daily
+cron — Vercel automatically sends the correct auth header when `CRON_SECRET`
+is set as an environment variable on the project.
+
+## Deliberate scope cuts (v2 ideas)
+
+Friends/activity feed, reviews/ratings, movie tracking, a native app, and
+recommendations are all out of scope for this MVP — see the original brief
+for reasoning.

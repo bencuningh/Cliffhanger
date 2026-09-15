@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ShowStatus {
+  RETURNING
+  ENDED
+  CANCELED
+  IN_PRODUCTION
+  PLANNED
+  UNKNOWN
+}
+
+enum UserShowStatus {
+  WATCHING
+  PLAN_TO_WATCH
+  COMPLETED
+  DROPPED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String?
+  name         String?
+  image        String?
+  createdAt    DateTime @default(now())
+
+  shows    UserShow[]
+  episodes UserEpisode[]
+}
+
+/// Cached copy of a TMDb TV show, refreshed periodically.
+model Show {
+  id          String     @id @default(cuid())
+  tmdbId      Int        @unique
+  title       String
+  overview    String?
+  posterUrl   String?
+  backdropUrl String?
+  status      ShowStatus @default(UNKNOWN)
+  firstAirDate DateTime?
+  runtimeMins Int?
+  lastSyncedAt DateTime  @default(now())
+  createdAt   DateTime   @default(now())
+
+  seasons Season[]
+  users   UserShow[]
+}
+
+model Season {
+  id            String   @id @default(cuid())
+  showId        String
+  show          Show     @relation(fields: [showId], references: [id], onDelete: Cascade)
+  tmdbId        Int
+  seasonNumber  Int
+  episodeCount  Int      @default(0)
+  posterUrl     String?
+
+  episodes Episode[]
+
+  @@unique([showId, seasonNumber])
+}
+
+model Episode {
+  id            String    @id @default(cuid())
+  seasonId      String
+  season        Season    @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  tmdbId        Int
+  episodeNumber Int
+  title         String
+  overview      String?
+  airDate       DateTime?
+  runtimeMins   Int?
+
+  watchedBy UserEpisode[]
+
+  @@unique([seasonId, episodeNumber])
+}
+
+/// A show on a user's list, with their personal tracking status.
+model UserShow {
+  id      String         @id @default(cuid())
+  userId  String
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  showId  String
+  show    Show           @relation(fields: [showId], references: [id], onDelete: Cascade)
+  status  UserShowStatus @default(PLAN_TO_WATCH)
+  addedAt DateTime       @default(now())
+
+  @@unique([userId, showId])
+}
+
+/// Presence of a row means the user has watched that episode.
+model UserEpisode {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  episodeId String
+  episode   Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  watchedAt DateTime @default(now())
+
+  @@unique([userId, episodeId])
+}

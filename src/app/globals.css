@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+:root {
+  /* Backgrounds */
+  --bg-primary: #0a0612;
+  --bg-surface: #120b1f;
+  --bg-surface-hover: #1a1128;
+
+  /* Neon purple (core brand color) */
+  --neon-primary: #b026ff;
+  --neon-deep: #8b2fe8;
+  --neon-light: #d896ff;
+  --neon-dark: #6a0dad;
+
+  /* Accent colors — use sparingly, as contrast against purple */
+  --neon-cyan: #00f0ff;
+  --neon-pink: #ff2e9f;
+
+  /* Text */
+  --text-primary: #f5f0ff;
+  --text-secondary: #b8afc9;
+}
+
+@theme inline {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-surface-hover: var(--bg-surface-hover);
+
+  --color-neon-primary: var(--neon-primary);
+  --color-neon-deep: var(--neon-deep);
+  --color-neon-light: var(--neon-light);
+  --color-neon-dark: var(--neon-dark);
+
+  --color-neon-cyan: var(--neon-cyan);
+  --color-neon-pink: var(--neon-pink);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Only apply to focal elements: logo, primary CTA, active nav item.
+   Not for every heading — heavy glow everywhere loses its impact. */
+.neon-text {
+  color: var(--text-primary);
+  text-shadow:
+    0 0 4px var(--neon-light),
+    0 0 12px var(--neon-primary),
+    0 0 24px var(--neon-primary),
+    0 0 48px var(--neon-deep);
+}
+
+.neon-border {
+  border: 1px solid var(--neon-primary);
+  box-shadow:
+    0 0 6px var(--neon-primary),
+    0 0 16px var(--neon-deep),
+    inset 0 0 6px rgba(176, 38, 255, 0.3);
+}
+
+/* Buttons/interactive elements glow on hover/focus rather than at rest,
+   so the effect feels responsive rather than overwhelming. */
+.neon-button {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--neon-deep);
+  transition:
+    box-shadow 0.2s ease,
+    text-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.neon-button:hover,
+.neon-button:focus-visible {
+  background: var(--bg-surface-hover);
+  box-shadow:
+    0 0 6px var(--neon-primary),
+    0 0 16px var(--neon-deep),
+    inset 0 0 6px rgba(176, 38, 255, 0.3);
+  text-shadow: 0 0 6px var(--neon-light);
+}
+
+.neon-button-primary {
+  background: var(--neon-deep);
+  color: var(--text-primary);
+  border: 1px solid var(--neon-primary);
+  transition:
+    box-shadow 0.2s ease,
+    text-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.neon-button-primary:hover,
+.neon-button-primary:focus-visible {
+  background: var(--neon-primary);
+  box-shadow:
+    0 0 8px var(--neon-primary),
+    0 0 24px var(--neon-deep),
+    0 0 48px var(--neon-dark);
+  text-shadow: 0 0 6px var(--neon-light);
+}
