@@ -28,7 +28,10 @@ export async function PATCH(
 
   const userShow = await prisma.userShow.update({
     where: { id: userShowId },
-    data: { status: body.status },
+    data: {
+      status: body.status,
+      completedAt: body.status === "COMPLETED" ? new Date() : null,
+    },
   });
 
   return NextResponse.json({ userShow });

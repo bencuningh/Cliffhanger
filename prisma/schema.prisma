@@ -85,13 +85,14 @@ model Episode {
 
 /// A show on a user's list, with their personal tracking status.
 model UserShow {
-  id      String         @id @default(cuid())
-  userId  String
-  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  showId  String
-  show    Show           @relation(fields: [showId], references: [id], onDelete: Cascade)
-  status  UserShowStatus @default(PLAN_TO_WATCH)
-  addedAt DateTime       @default(now())
+  id          String         @id @default(cuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  showId      String
+  show        Show           @relation(fields: [showId], references: [id], onDelete: Cascade)
+  status      UserShowStatus @default(PLAN_TO_WATCH)
+  addedAt     DateTime       @default(now())
+  completedAt DateTime?
 
   @@unique([userId, showId])
 }
